@@ -6,10 +6,16 @@ import threading
 import time
 import datetime
 from time import strftime
+from xmldiff import main as xmldiffM
 
 def load_inf():
     tree = ET.parse('data.xml')
     return tree, tree.getroot()
+
+def save_inf(root):
+    with open('data.xml.temp', 'wb') as f:
+        b_tree = ET.tostring(root, encoding='UTF-8', xml_declaration=True)
+        f.write(b_tree)
 
 def convert_month(num):
     month_dic = {'01':'січня',
@@ -40,16 +46,15 @@ def get_day(date):
 
     return day_dic[datetime.datetime(year, month, day).weekday()]
 
-def show_inf(tree_last, root_last):
+def main():
     tree, root = load_inf()
+    save_inf(root)
 
     def chage_checker():
-        if tree != tree_last:
-            print(1, tree_last, tree)
-            threading.Timer(5.0, show_inf, [tree, root]).start()
-        else:
-            print(2)
+        if len(xmldiffM.diff_files('data.xml', 'data.xml.temp')) == 0:
             threading.Timer(5.0, chage_checker).start()
+        else:
+            main()
 
     for i in range(len(root)):
         datetime_str = root[i].attrib['value']
@@ -70,13 +75,13 @@ def show_inf(tree_last, root_last):
 
     chage_checker()
 
-if __name__ == '__main__':
-    tree, root = load_inf()
-    print(' \x1B[3mневідомий місяць\x1B[0m')
-    show_inf(tree, root)
+#print(' \x1B[3mневідомий місяць\x1B[0m')
 
-    #exrcutor = ProcessPoolExecutor(2)
-    #loop = asyncio.new_event_loop()
-    #gI = loop.run_in_executor(exrcutor, getInf)
-    #sI = loop.run_in_executor(exrcutor, showInf)
-    #loop.run_forever()
+# exrcutor = ProcessPoolExecutor(2)
+# loop = asyncio.new_event_loop()
+# gI = loop.run_in_executor(exrcutor, getInf)
+# sI = loop.run_in_executor(exrcutor, showInf)
+# loop.run_forever()
+
+if __name__ == '__main__':
+    main()
