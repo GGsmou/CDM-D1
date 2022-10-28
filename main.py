@@ -26,7 +26,7 @@ def convert_month(num):
                  '12':'грудня'}
     return month_dic[num]
 
-def getDay(date):
+def get_day(date):
     day_dic = {0:'ПН',
                1:'ВТ',
                2:'СР',
@@ -43,11 +43,17 @@ def getDay(date):
 def show_inf(tree_last, root_last):
     tree, root = load_inf()
 
-    def chage_checker
+    def chage_checker():
+        if tree != tree_last:
+            print(1, tree_last, tree)
+            threading.Timer(5.0, show_inf, [tree, root]).start()
+        else:
+            print(2)
+            threading.Timer(5.0, chage_checker).start()
 
     for i in range(len(root)):
         datetime_str = root[i].attrib['value']
-        print(f'{datetime_str[-2:]} {convert_month(datetime_str[5:7])} ({getDay(datetime_str)})')
+        print(f'{datetime_str[-2:]} {convert_month(datetime_str[5:7])} ({get_day(datetime_str)})')
 
         for c in range(len(root[i][0])):
             film_name = root[i][0][c].attrib["name"]
@@ -62,8 +68,7 @@ def show_inf(tree_last, root_last):
 
             print(f'    {film_name}{tabs}{time_str}')
 
-    if root_last != root:
-        threading.Timer(5.0, show_inf, [tree, root]).start()
+    chage_checker()
 
 if __name__ == '__main__':
     tree, root = load_inf()
