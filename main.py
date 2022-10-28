@@ -1,11 +1,6 @@
 import xml.etree.ElementTree as ET
-import uuid
-import asyncio
-from concurrent.futures import ProcessPoolExecutor
 import threading
-import time
 import datetime
-from time import strftime
 from xmldiff import main as xmldiffM
 
 def load_inf():
@@ -72,16 +67,13 @@ def main():
                 time_str += f'{div_symb}{root[i][0][c][0][b].attrib["time"]}'
 
             print(f'    {film_name}{tabs}{time_str}')
+        print('')
+    print('Команди:')
+    print('1. Забронювати сеанс')
+    print('2. Список заброньованих сеансів')
 
     chage_checker()
 
-#print(' \x1B[3mневідомий місяць\x1B[0m')
-
-# exrcutor = ProcessPoolExecutor(2)
-# loop = asyncio.new_event_loop()
-# gI = loop.run_in_executor(exrcutor, getInf)
-# sI = loop.run_in_executor(exrcutor, showInf)
-# loop.run_forever()
-
 if __name__ == '__main__':
+    comand = 0
     main()
