@@ -43,6 +43,9 @@ def get_day(date):
 
     return day_dic[datetime.datetime(year, month, day).weekday()]
 
+def reserv(film, date):
+    None
+
 def main():
     tree, root = load_inf()
     save_inf(root)
@@ -57,21 +60,21 @@ def main():
             input_text()
             return
 
-        try:
-            comand_inp = int(comand_inp)
+        if comand == 1 and comand_inp != '1':
+            reserv(comand_inp[0: -7], comand_inp[-5:])
+            return
 
-            if comand_inp == comand:
-                error_msg()
-            elif comand_inp in [1, 2]:
-                if comand == 0:
-                    comand = comand_inp
-                elif comand == 1:
-                    comand = 0
-                elif comand == 2: comand = 0
-                main()
-            else: error_msg()
-
-        except ValueError: error_msg()
+        else:
+            try:
+                comand_inp = int(comand_inp)
+                if comand_inp in [1, 2]:
+                    if comand == 0:  comand = comand_inp
+                    elif comand == 1: comand = 0
+                    elif comand == 2: comand = 0
+                    main()
+                    return
+                else: error_msg()
+            except ValueError: error_msg()
 
     def input_text():
         if comand == 0:
@@ -119,7 +122,7 @@ def main():
         input_text()
     elif comand == 1:
         print('')
-        print('Вільні сеанси')
+        print('Вільні сеанси:')
         have_print = False
         not_to_print = []
 
@@ -165,7 +168,7 @@ def main():
         input_text()
     elif comand == 2:
         print('')
-        print('Заброньовані сеанси')
+        print('Заброньовані сеанси:')
         have_print = False
         not_to_print = []
 
