@@ -55,16 +55,22 @@ def main():
             print('')
             print('Не коректне значення')
             input_text()
+            return
 
         try:
             comand_inp = int(comand_inp)
 
-            if comand_inp == comand: error_msg()
-            elif comand_inp in [0, 1, 2]:
-                comand = comand_inp
+            if comand_inp == comand:
+                error_msg()
+            elif comand_inp in [1, 2]:
+                if comand == 0:
+                    comand = comand_inp
+                elif comand == 1:
+                    comand = 0
+                elif comand == 2: comand = 0
                 main()
-
             else: error_msg()
+
         except ValueError: error_msg()
 
     def input_text():
@@ -73,8 +79,18 @@ def main():
             print('Команди:')
             print('1. Забронювати сеанс')
             print('2. Список заброньованих сеансів')
+        elif comand == 1:
+            print('')
+            print('Команди:')
+            print('1. Повернутися назад')
+            print('Щоб забронювати сеанс, введіть дані в форматі: Назва, 00:00')
+        elif comand == 2:
+            print('')
+            print('Команди:')
+            print('1. Повернутися назад')
 
-        threading.Thread(target=input_proces, daemon=True).start()
+
+        threading.Thread(target=input_proces).start()
 
     def chage_checker():
         if len(xmldiffM.diff_files('data.xml', 'data.xml.temp')) == 0:
@@ -102,6 +118,8 @@ def main():
                 print(f'    {film_name}{tabs}{time_str}')
         input_text()
     elif comand == 1:
+        print('')
+        print('Вільні сеанси')
         have_print = False
         not_to_print = []
 
@@ -122,7 +140,6 @@ def main():
 
             if not film_name: not_to_print.append(root[i])
 
-        print('')
         for i in range(len(root)):
             if not root[i] in not_to_print:
                 have_print = True
@@ -144,6 +161,52 @@ def main():
 
                         print(f'    {film_name}{tabs}{time_str}')
         if not have_print: print('Немає вільних сеансів')
+
+        input_text()
+    elif comand == 2:
+        print('')
+        print('Заброньовані сеанси')
+        have_print = False
+        not_to_print = []
+
+        for i in range(len(root)):
+            film_name = False
+
+            for c in range(len(root[i][0])):
+                time_str = False
+
+                for b in range(len(root[i][0][c][0])):
+                    if root[i][0][c][0][b].attrib["reserv"] == 'T': time_str = True
+                    if time_str: break
+
+                if not time_str:
+                    not_to_print.append(root[i][0][c])
+                else:
+                    film_name = True
+
+            if not film_name: not_to_print.append(root[i])
+
+        for i in range(len(root)):
+            if not root[i] in not_to_print:
+                have_print = True
+                datetime_str = root[i].attrib['value']
+                print(f'{datetime_str[-2:]} {convert_month(datetime_str[5:7])} ({get_day(datetime_str)})')
+
+                for c in range(len(root[i][0])):
+                    if not root[i][0][c] in not_to_print:
+                        film_name = root[i][0][c].attrib["name"]
+                        tab_count = 20 - len(film_name)
+                        tabs = ' ' * tab_count
+                        time_str = ''
+
+                        for b in range(len(root[i][0][c][0])):
+                            if root[i][0][c][0][b].attrib["reserv"] == 'T':
+                                div_symb = ' | '
+                                if time_str == '': div_symb = ''
+                                time_str += f'{div_symb}{root[i][0][c][0][b].attrib["time"]}'
+
+                        print(f'    {film_name}{tabs}{time_str}')
+        if not have_print: print('Немає заброньованих сеансів')
 
         input_text()
 
