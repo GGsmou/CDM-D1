@@ -33,7 +33,7 @@
       <movie id="01683097-397e-4cfe-9dbf-40b73a8b2b43" name="Зеленая книга">
         <sessions>
           <session reserv="T" time="11:30" />
-          <session reserv="F" time="16:45" />
+          <session reserv="F" time="16:40" />
         </sessions>
       </movie>
     </movies>

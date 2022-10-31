@@ -1,7 +1,6 @@
 import xml.etree.ElementTree as ET
 import threading
 import datetime
-import sys
 from xmldiff import main as xmldiffM
 
 comand = 0
@@ -44,38 +43,38 @@ def get_day(date):
 
     return day_dic[datetime.datetime(year, month, day).weekday()]
 
-def input_proces():
-    global comand
-    #print('>    ')
-    #comand_inp = sys.stdin.readline(1)
-    comand_inp = input('>    ')
-
-    try:
-        comand_inp = int(comand_inp)
-
-        if comand_inp == comand:
-            return 'same'
-        elif comand_inp in [0, 1, 2]:
-            print('Не коректне значення')
-            return 'error'
-        else:
-            comand = comand_inp
-            return 'ok'
-    except NameError:
-        print('Не коректне значення')
-        return 'error'
-
 def main():
     tree, root = load_inf()
     save_inf(root)
 
+    def input_proces():
+        global comand
+        comand_inp = input('>    ')
+
+        def error_msg():
+            print('')
+            print('Не коректне значення')
+            input_text()
+
+        try:
+            comand_inp = int(comand_inp)
+
+            if comand_inp == comand: error_msg()
+            elif comand_inp in [0, 1, 2]:
+                comand = comand_inp
+                main()
+
+            else: error_msg()
+        except ValueError: error_msg()
+
     def input_text():
         if comand == 0:
+            print('')
             print('Команди:')
             print('1. Забронювати сеанс')
             print('2. Список заброньованих сеансів')
 
-            threading.Thread(target=input_proces, daemon=True).start()
+        threading.Thread(target=input_proces, daemon=True).start()
 
     def chage_checker():
         if len(xmldiffM.diff_files('data.xml', 'data.xml.temp')) == 0:
@@ -83,6 +82,7 @@ def main():
         else:
             main()
     if comand == 0:
+        print('')
         for i in range(len(root)):
             datetime_str = root[i].attrib['value']
             print(f'{datetime_str[-2:]} {convert_month(datetime_str[5:7])} ({get_day(datetime_str)})')
@@ -101,7 +101,6 @@ def main():
                 if time_str == '': time_str = 'Всі білети заброньовано'
 
                 print(f'    {film_name}{tabs}{time_str}')
-            print('')
 
         input_text()
 
