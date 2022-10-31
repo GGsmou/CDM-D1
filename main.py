@@ -99,8 +99,51 @@ def main():
                         if time_str == '': div_symb = ''
                         time_str += f'{div_symb}{root[i][0][c][0][b].attrib["time"]}'
                 if time_str == '': time_str = 'Всі білети заброньовано'
-
                 print(f'    {film_name}{tabs}{time_str}')
+        input_text()
+    elif comand == 1:
+        have_print = False
+        not_to_print = []
+
+        for i in range(len(root)):
+            film_name = False
+
+            for c in range(len(root[i][0])):
+                time_str = False
+
+                for b in range(len(root[i][0][c][0])):
+                    if root[i][0][c][0][b].attrib["reserv"] == 'F': time_str = True
+                    if time_str: break
+
+                if not time_str:
+                    not_to_print.append(root[i][0][c])
+                else:
+                    film_name = True
+
+            if not film_name: not_to_print.append(root[i])
+
+        print('')
+        for i in range(len(root)):
+            if not root[i] in not_to_print:
+                have_print = True
+                datetime_str = root[i].attrib['value']
+                print(f'{datetime_str[-2:]} {convert_month(datetime_str[5:7])} ({get_day(datetime_str)})')
+
+                for c in range(len(root[i][0])):
+                    if not root[i][0][c] in not_to_print:
+                        film_name = root[i][0][c].attrib["name"]
+                        tab_count = 20 - len(film_name)
+                        tabs = ' ' * tab_count
+                        time_str = ''
+
+                        for b in range(len(root[i][0][c][0])):
+                            if root[i][0][c][0][b].attrib["reserv"] == 'F':
+                                div_symb = ' | '
+                                if time_str == '': div_symb = ''
+                                time_str += f'{div_symb}{root[i][0][c][0][b].attrib["time"]}'
+
+                        print(f'    {film_name}{tabs}{time_str}')
+        if not have_print: print('Немає вільних сеансів')
 
         input_text()
 
