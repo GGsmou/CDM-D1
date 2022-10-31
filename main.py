@@ -1,12 +1,10 @@
 import xml.etree.ElementTree as ET
 import threading
-import multiprocessing
 import datetime
 import sys
 from xmldiff import main as xmldiffM
 
 comand = 0
-input_processes = []
 
 def load_inf():
     tree = ET.parse('data.xml')
@@ -48,8 +46,9 @@ def get_day(date):
 
 def input_proces():
     global comand
-    print('>    ')
-    comand_inp = repr(sys.stdin.readline(1))
+    #print('>    ')
+    #comand_inp = sys.stdin.readline(1)
+    comand_inp = input('>    ')
 
     try:
         comand_inp = int(comand_inp)
@@ -76,15 +75,12 @@ def main():
             print('1. Забронювати сеанс')
             print('2. Список заброньованих сеансів')
 
-        process = multiprocessing.Process(target=input_proces)
-        process.start()
-        input_processes.append(process)
+            threading.Thread(target=input_proces, daemon=True).start()
 
     def chage_checker():
         if len(xmldiffM.diff_files('data.xml', 'data.xml.temp')) == 0:
             threading.Timer(5.0, chage_checker).start()
         else:
-            input_processes[0].terminate()
             main()
     if comand == 0:
         for i in range(len(root)):
