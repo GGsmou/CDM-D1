@@ -1,52 +1,43 @@
-import xml.etree.ElementTree as ET
-import threading
-import datetime
 from xmldiff import main as xmldiffM
-import sys
+import xml.etree.ElementTree as ET
+import threading, datetime, sys
 
+stop_inp = False
 comand = 0
-
-def load_inf():
-    tree = ET.parse('data.xml')
-    return tree, tree.getroot()
-
-def save_inf(root):
-    with open('data.xml.temp', 'wb') as f:
-        b_tree = ET.tostring(root, encoding='UTF-8', xml_declaration=True)
-        f.write(b_tree)
-
-def convert_month(num):
-    month_dic = {'01':'січня',
-                 '02':'лютого',
-                 '03':'березня',
-                 '04':'квітня',
-                 '05':'травня',
-                 '06':'червня',
-                 '07':'липня',
-                 '08':'серпня',
-                 '09':'вересня',
-                 '10':'жовтня',
-                 '11':'листопада',
-                 '12':'грудня'}
-    return month_dic[num]
+month_dic = {'01': 'січня',
+             '02': 'лютого',
+             '03': 'березня',
+             '04': 'квітня',
+             '05': 'травня',
+             '06': 'червня',
+             '07': 'липня',
+             '08': 'серпня',
+             '09': 'вересня',
+             '10': 'жовтня',
+             '11': 'листопада',
+             '12': 'грудня'}
+day_dic = {0: 'ПН',
+           1: 'ВТ',
+           2: 'СР',
+           3: 'ЧТ',
+           4: 'ПТ',
+           5: 'СБ',
+           6: 'НД'}
 
 def get_day(date):
-    day_dic = {0:'ПН',
-               1:'ВТ',
-               2:'СР',
-               3:'ЧТ',
-               4:'ПТ',
-               5:'СБ',
-               6:'НД',}
     year = int(date[0:4])
     month = int(date[5:7])
     day = int(date[-2:])
 
     return day_dic[datetime.datetime(year, month, day).weekday()]
-stop_inp = False
+
 def main():
-    tree, root = load_inf()
-    save_inf(root)
+    tree = ET.parse('data.xml')
+    root = tree.getroot()
+
+    with open('data.xml.temp', 'wb') as f:
+        b_tree = ET.tostring(root, encoding='UTF-8', xml_declaration=True)
+        f.write(b_tree)
 
     def reserv(date, film, time, root):
         print('')
@@ -146,11 +137,12 @@ def main():
             global stop_inp
             stop_inp = True
             main()
+
     if comand == 0:
         print('')
         for i in range(len(root)):
             datetime_str = root[i].attrib['value']
-            print(f'{datetime_str[-2:]} {convert_month(datetime_str[5:7])} ({get_day(datetime_str)})')
+            print(f'{datetime_str[-2:]} {month_dic[datetime_str[5:7]]} ({get_day(datetime_str)})')
 
             for c in range(len(root[i][0])):
                 film_name = root[i][0][c].attrib["name"]
@@ -193,7 +185,7 @@ def main():
             if not root[i] in not_to_print:
                 have_print = True
                 datetime_str = root[i].attrib['value']
-                print(f'{datetime_str[-2:]} {convert_month(datetime_str[5:7])} ({get_day(datetime_str)})')
+                print(f'{datetime_str[-2:]} {month_dic[datetime_str[5:7]]} ({get_day(datetime_str)})')
 
                 for c in range(len(root[i][0])):
                     if not root[i][0][c] in not_to_print:
@@ -239,7 +231,7 @@ def main():
             if not root[i] in not_to_print:
                 have_print = True
                 datetime_str = root[i].attrib['value']
-                print(f'{datetime_str[-2:]} {convert_month(datetime_str[5:7])} ({get_day(datetime_str)})')
+                print(f'{datetime_str[-2:]} {month_dic[datetime_str[5:7]]} ({get_day(datetime_str)})')
 
                 for c in range(len(root[i][0])):
                     if not root[i][0][c] in not_to_print:
