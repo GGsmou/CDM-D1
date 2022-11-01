@@ -2,6 +2,7 @@ import xml.etree.ElementTree as ET
 import threading
 import datetime
 from xmldiff import main as xmldiffM
+import sys
 
 comand = 0
 
@@ -42,7 +43,7 @@ def get_day(date):
     day = int(date[-2:])
 
     return day_dic[datetime.datetime(year, month, day).weekday()]
-
+stop_inp = False
 def main():
     tree, root = load_inf()
     save_inf(root)
@@ -85,34 +86,39 @@ def main():
 
     def input_proces(root):
         try:
-            global comand
-            comand_inp = input('>    ')
+            for comand_inp in sys.stdin:
+                global comand
+                print('>    ')
+                print('\r')
 
-            def error_msg():
-                print('')
-                print('Не коректне значення')
-                input_text(root)
-                return
+                def error_msg():
+                    print('')
+                    print('Не коректне значення')
+                    input_text(root)
+                    return
 
-            if comand == 1 and comand_inp != '1':
-                reserv(comand_inp[0: 5], comand_inp[7: -7], comand_inp[-5:], root)
-                return
+                if comand == 1 and comand_inp[0] != '1':
+                    reserv(comand_inp[0: 5], comand_inp[7: -8], comand_inp[-6:-1], root)
+                    return
+                else:
+                    try:
+                        comand_inp = int(comand_inp[0])
+                        if comand_inp in [1, 2]:
+                            if comand == 0:  comand = comand_inp
+                            elif comand == 1: comand = 0
+                            elif comand == 2: comand = 0
+                            main()
+                            return
+                        else: error_msg()
+                    except ValueError: error_msg()
 
-            else:
-                try:
-                    comand_inp = int(comand_inp)
-                    if comand_inp in [1, 2]:
-                        if comand == 0:  comand = comand_inp
-                        elif comand == 1: comand = 0
-                        elif comand == 2: comand = 0
-                        main()
-                        return
-                    else: error_msg()
-                except ValueError: error_msg()
+                if stop_inp: break
         except UnicodeDecodeError:
             return
 
     def input_text(root):
+        global stop_inp
+        stop_inp = False
         if comand == 0:
             print('')
             print('Команди:')
@@ -135,6 +141,8 @@ def main():
         if len(xmldiffM.diff_files('data.xml', 'data.xml.temp')) == 0:
             threading.Timer(5.0, chage_checker).start()
         else:
+            global stop_inp
+            stop_inp = True
             main()
     if comand == 0:
         print('')

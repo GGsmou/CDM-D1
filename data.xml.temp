@@ -5,12 +5,12 @@
       <movie id="ed0c5c20-4259-4b09-823a-1a6531221060" name="Власть">
         <sessions>
           <session reserv="T" time="10:30" />
-          <session reserv="F" time="18:00" />
+          <session reserv="F" time="19:00" />
         </sessions>
       </movie>
       <movie id="051eaee5-0bc5-43f4-8435-20e3498083cc" name="Стекло">
         <sessions>
-          <session reserv="F" time="10:00" />
+          <session reserv="F" time="11:00" />
         </sessions>
       </movie>
     </movies>
@@ -19,8 +19,8 @@
     <movies>
       <movie id="ed0c5c20-4259-4b09-823a-1a6531221060" name="Власть">
         <sessions>
-          <session reserv="F" time="11:50" />
-          <session reserv="F" time="19:00" />
+          <session reserv="T" time="11:50" />
+          <session reserv="T" time="19:00" />
         </sessions>
       </movie>
       <movie id="22d41e99-6a1b-4d1b-9adf-dd6fbba3835b" name="Лего фильм 2">
