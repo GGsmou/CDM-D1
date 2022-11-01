@@ -133,10 +133,7 @@ def main():
 
     def chage_checker():
         if len(xmldiffM.diff_files('data.xml', 'data.xml.temp')) == 0:
-            t = threading.Timer(5.0, chage_checker)
-            t.daemon = True
-            t.start()
-            t.join()
+            threading.Timer(5.0, chage_checker).start()
         else:
             main()
     if comand == 0:
