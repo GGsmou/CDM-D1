@@ -68,7 +68,7 @@ def main():
                                 time_str = root[i][0][c][0][b].attrib["time"]
                                 if time_str == time:
                                     is_time = True
-                                    print(f'Білет на фільм {film} зарезервовано на {time} | {date}')
+                                    print(f'Білет на фільм {film} заброньовано на {time} | {date}')
                                     root[i][0][c][0][b].attrib["reserv"] = 'T'
                                     with open('data.xml', 'wb') as f:
                                         b_tree = ET.tostring(root, encoding='UTF-8', xml_declaration=True)
