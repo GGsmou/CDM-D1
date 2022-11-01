@@ -86,10 +86,9 @@ def main():
 
     def input_proces(root):
         try:
+            print(f'>    ', end='', flush=True)
             for comand_inp in sys.stdin:
                 global comand
-                print('>    ')
-                print('\r')
 
                 def error_msg():
                     print('')
@@ -103,10 +102,13 @@ def main():
                 else:
                     try:
                         comand_inp = int(comand_inp[0])
-                        if comand_inp in [1, 2]:
-                            if comand == 0:  comand = comand_inp
-                            elif comand == 1: comand = 0
-                            elif comand == 2: comand = 0
+
+                        if comand_inp in [1, 2] and comand == 0:
+                            comand = comand_inp
+                            main()
+                            return
+                        elif comand_inp == 1 and comand in [1, 2]:
+                            comand = 0
                             main()
                             return
                         else: error_msg()
