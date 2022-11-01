@@ -43,40 +43,76 @@ def get_day(date):
 
     return day_dic[datetime.datetime(year, month, day).weekday()]
 
-def reserv(film, date):
-    None
-
 def main():
     tree, root = load_inf()
     save_inf(root)
 
-    def input_proces():
-        global comand
-        comand_inp = input('>    ')
+    def reserv(date, film, time, root):
+        print('')
+        is_date = False
+        is_film = False
+        is_time = False
 
-        def error_msg():
-            print('')
-            print('Не коректне значення')
-            input_text()
+        for i in range(len(root)):
+            datetime_str = root[i].attrib['value']
+            datetime = f'{datetime_str[-2:]}.{datetime_str[5:7]}'
+
+            if datetime == date:
+                is_date = True
+                for c in range(len(root[i][0])):
+                    film_name = root[i][0][c].attrib["name"]
+                    if film_name == film:
+                        is_film = True
+                        for b in range(len(root[i][0][c][0])):
+                            if root[i][0][c][0][b].attrib["reserv"] == 'F':
+                                time_str = root[i][0][c][0][b].attrib["time"]
+                                if time_str == time:
+                                    is_time = True
+                                    print(f'Білет на фільм {film} зарезервовано на {time} | {date}')
+                                    root[i][0][c][0][b].attrib["reserv"] = 'T'
+                                    with open('data.xml', 'wb') as f:
+                                        b_tree = ET.tostring(root, encoding='UTF-8', xml_declaration=True)
+                                        f.write(b_tree)
+        if not is_date:
+            print('Такої дати не існує')
+            input_text(root)
+        elif not is_film:
+            print('Такого фільму не існує')
+            input_text(root)
+        elif not is_time:
+            print('Такого часу не існує')
+            input_text(root)
+
+    def input_proces(root):
+        try:
+            global comand
+            comand_inp = input('>    ')
+
+            def error_msg():
+                print('')
+                print('Не коректне значення')
+                input_text(root)
+                return
+
+            if comand == 1 and comand_inp != '1':
+                reserv(comand_inp[0: 5], comand_inp[7: -7], comand_inp[-5:], root)
+                return
+
+            else:
+                try:
+                    comand_inp = int(comand_inp)
+                    if comand_inp in [1, 2]:
+                        if comand == 0:  comand = comand_inp
+                        elif comand == 1: comand = 0
+                        elif comand == 2: comand = 0
+                        main()
+                        return
+                    else: error_msg()
+                except ValueError: error_msg()
+        except UnicodeDecodeError:
             return
 
-        if comand == 1 and comand_inp != '1':
-            reserv(comand_inp[0: -7], comand_inp[-5:])
-            return
-
-        else:
-            try:
-                comand_inp = int(comand_inp)
-                if comand_inp in [1, 2]:
-                    if comand == 0:  comand = comand_inp
-                    elif comand == 1: comand = 0
-                    elif comand == 2: comand = 0
-                    main()
-                    return
-                else: error_msg()
-            except ValueError: error_msg()
-
-    def input_text():
+    def input_text(root):
         if comand == 0:
             print('')
             print('Команди:')
@@ -86,18 +122,21 @@ def main():
             print('')
             print('Команди:')
             print('1. Повернутися назад')
-            print('Щоб забронювати сеанс, введіть дані в форматі: Назва, 00:00')
+            print('Щоб забронювати сеанс, введіть дані в форматі: 24.06, Назва, 00:00')
         elif comand == 2:
             print('')
             print('Команди:')
             print('1. Повернутися назад')
 
 
-        threading.Thread(target=input_proces).start()
+        threading.Thread(target=input_proces, args=[root]).start()
 
     def chage_checker():
         if len(xmldiffM.diff_files('data.xml', 'data.xml.temp')) == 0:
-            threading.Timer(5.0, chage_checker).start()
+            t = threading.Timer(5.0, chage_checker)
+            t.daemon = True
+            t.start()
+            t.join()
         else:
             main()
     if comand == 0:
@@ -119,7 +158,7 @@ def main():
                         time_str += f'{div_symb}{root[i][0][c][0][b].attrib["time"]}'
                 if time_str == '': time_str = 'Всі білети заброньовано'
                 print(f'    {film_name}{tabs}{time_str}')
-        input_text()
+        input_text(root)
     elif comand == 1:
         print('')
         print('Вільні сеанси:')
@@ -165,7 +204,7 @@ def main():
                         print(f'    {film_name}{tabs}{time_str}')
         if not have_print: print('Немає вільних сеансів')
 
-        input_text()
+        input_text(root)
     elif comand == 2:
         print('')
         print('Заброньовані сеанси:')
@@ -211,7 +250,7 @@ def main():
                         print(f'    {film_name}{tabs}{time_str}')
         if not have_print: print('Немає заброньованих сеансів')
 
-        input_text()
+        input_text(root)
 
     chage_checker()
 
