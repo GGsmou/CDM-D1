@@ -2,6 +2,8 @@ from xmldiff import main as xmldiffM
 import xml.etree.ElementTree as ET
 import threading, datetime, sys
 
+tree = ET.parse('data.xml')
+root = tree.getroot()
 stop_inp = False
 comand = 0
 month_dic = {'01': 'січня',
@@ -24,6 +26,17 @@ day_dic = {0: 'ПН',
            5: 'СБ',
            6: 'НД'}
 
+def sync_tree():
+    global tree
+    global root
+
+    tree = ET.parse('data.xml')
+    root = tree.getroot()
+
+    with open('data.xml.temp', 'wb') as f:
+        b_tree = ET.tostring(root, encoding='UTF-8', xml_declaration=True)
+        f.write(b_tree)
+
 def get_day(date):
     year = int(date[0:4])
     month = int(date[5:7])
@@ -33,12 +46,7 @@ def get_day(date):
 
 def main():
     print('')
-    tree = ET.parse('data.xml')
-    root = tree.getroot()
-
-    with open('data.xml.temp', 'wb') as f:
-        b_tree = ET.tostring(root, encoding='UTF-8', xml_declaration=True)
-        f.write(b_tree)
+    sync_tree()
 
     def change_checker():
         if len(xmldiffM.diff_files('data.xml', 'data.xml.temp')) == 0:
@@ -48,7 +56,7 @@ def main():
             stop_inp = True
             main()
 
-    def input_text(root):
+    def input_text():
         print('')
         print('Команди:')
 
@@ -64,9 +72,9 @@ def main():
         elif comand == 2:
             print('1. Повернутися назад')
 
-        threading.Thread(target=input_proces, args=[root]).start()
+        threading.Thread(target=input_proces).start()
 
-    def input_proces(root):
+    def input_proces():
         try:
             print(f'>    ', end='', flush=True)
             for comand_inp in sys.stdin:
@@ -75,11 +83,11 @@ def main():
                 def error_msg():
                     print('')
                     print('Не коректне значення')
-                    input_text(root)
+                    input_text()
                     return
 
                 if comand == 1 and comand_inp[0] != '1':
-                    reserv(comand_inp[0: 5], comand_inp[7: -8], comand_inp[-6:-1], root)
+                    reserv(comand_inp[0: 5], comand_inp[7: -8], comand_inp[-6:-1])
                     return
                 else:
                     try:
@@ -102,7 +110,7 @@ def main():
         except UnicodeDecodeError:
             return
 
-    def reserv(date, film, time, root):
+    def reserv(date, film, time):
         print('')
         is_date = False
         is_film = False
@@ -123,7 +131,6 @@ def main():
                                 time_str = root[i][0][c][0][b].attrib["time"]
                                 if time_str == time:
                                     is_time = True
-                                    print(time_str, time, sep='-')
                                     print(f'Білет на фільм {film} заброньовано на {time} | {date}')
                                     root[i][0][c][0][b].attrib["reserv"] = 'T'
                                     with open('data.xml', 'wb') as f:
@@ -131,13 +138,13 @@ def main():
                                         f.write(b_tree)
         if not is_date:
             print('Такої дати не існує')
-            input_text(root)
+            input_text()
         elif not is_film:
             print('Такого фільму не існує')
-            input_text(root)
+            input_text()
         elif not is_time:
             print('Такого часу не існує')
-            input_text(root)
+            input_text()
 
     if comand == 0:
         for i in range(len(root)):
@@ -157,7 +164,6 @@ def main():
                         time_str += f'{div_symb}{root[i][0][c][0][b].attrib["time"]}'
                 if time_str == '': time_str = 'Всі білети заброньовано'
                 print(f'    {film_name}{tabs}{time_str}')
-        input_text(root)
     elif comand == 1:
         print('Вільні сеанси:')
         have_print = False
@@ -201,8 +207,6 @@ def main():
 
                         print(f'    {film_name}{tabs}{time_str}')
         if not have_print: print('Немає вільних сеансів')
-
-        input_text(root)
     elif comand == 2:
         print('Заброньовані сеанси:')
         have_print = False
@@ -247,8 +251,7 @@ def main():
                         print(f'    {film_name}{tabs}{time_str}')
         if not have_print: print('Немає заброньованих сеансів')
 
-        input_text(root)
-
+    input_text()
     change_checker()
 
 if __name__ == '__main__':
